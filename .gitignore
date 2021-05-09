@@ -1,6 +1,9 @@
 # VisualStudioCode
 .vscode
 
+# Build
+build
+
 # Prerequisites
 *.d
 
