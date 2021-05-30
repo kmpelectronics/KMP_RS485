@@ -33,6 +33,17 @@
 
 class KMP_RS485 : public Stream {
 public:
+#ifdef ESP32
+	/*!
+	 * @brief Crate an instance of KMP_RS485 with TX break control
+	 * @param hwSerial Serial port which is connected with RS485 chip
+	 * @param tePin Transmit enable pin
+	 * @param txPin Serial port TX pin
+	 * @param rxPin Serial port RX pin. Optional. Default is -1 not used.
+	 * @param teLevel Transmission enable level. Default is HIGH. Values: HIGH, LOW
+	 */
+	KMP_RS485(HardwareSerial& hwSerial, int tePin, int txPin, int rxPin, int teLevel = HIGH);
+#else
 	/*!
 	 * @brief Crate an instance of KMP_RS485 with TX break control
 	 * @param hwSerial Serial port which is connected with RS485 chip
@@ -41,7 +52,7 @@ public:
 	 * @param teLevel Transmission enable level. Default is HIGH. Values: HIGH, LOW
 	 */
 	KMP_RS485(HardwareSerial& hwSerial, int tePin, int txPin, int teLevel = HIGH);
-
+#endif
 	/*!
 	 * @brief Start RS485 connection
 	 * @param baud Speed. Values: 75, 110, 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200 and etc. bit/s
@@ -129,8 +140,12 @@ public:
 
 private:
 	HardwareSerial* _serial;
-	int _txPin;
 	int _tePin;
+	int _txPin;
+#ifdef ESP32
+	int _rxPin;
+	uint32_t _txPinFlushDelayINuS;
+#endif
 	int _teLevelHigh;
 	int _teLevelLow;
 

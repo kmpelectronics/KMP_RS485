@@ -28,12 +28,20 @@
 
 #include "KMP_RS485.h"
 
-KMP_RS485::KMP_RS485(HardwareSerial& hwSerial, int tePin, int txPin, int teLevel) :
+#ifdef ESP32
+KMP_RS485::KMP_RS485(HardwareSerial& hwSerial, int tePin, int txPin, int rxPin, int teLevel) :
 	_serial(&hwSerial),
 	_tePin(tePin),
 	_txPin(txPin),
-	_startTransmission(false) 
+	_rxPin(rxPin)
+#else
+KMP_RS485::KMP_RS485(HardwareSerial& hwSerial, int tePin, int txPin, int teLevel) :
+	_serial(&hwSerial),
+	_tePin(tePin),
+	_txPin(txPin)
+#endif
 { 
+	_startTransmission = false;
 	_teLevelHigh = teLevel;
 	_teLevelLow = teLevel == LOW ? HIGH : LOW ;
 }
@@ -160,6 +168,10 @@ void KMP_RS485::beginSerial(unsigned long baudrate, uint16_t config)
 #ifdef ESP8266
 	SerialConfig serialConfig = static_cast<SerialConfig>(config);
 	_serial->begin(baudrate, serialConfig);
+#elif ESP32
+	_serial->begin(baudrate, config, _rxPin, _txPin);
+	// It is not used at the moment
+	_txPinFlushDelayINuS = (uint32_t)((1000000 / baudrate) * 15);
 #else
 	_serial->begin(baudrate, config);
 #endif
