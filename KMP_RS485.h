@@ -38,11 +38,11 @@ public:
 	 * @brief Crate an instance of KMP_RS485 with TX break control
 	 * @param hwSerial Serial port which is connected with RS485 chip
 	 * @param tePin Transmit enable pin
-	 * @param txPin Serial port TX pin
+	 * @param txPin Serial port TX pin. Optional. Default is -1 not used.
 	 * @param rxPin Serial port RX pin. Optional. Default is -1 not used.
 	 * @param teLevel Transmission enable level. Default is HIGH. Values: HIGH, LOW
 	 */
-	KMP_RS485(HardwareSerial& hwSerial, int tePin, int txPin, int rxPin, int teLevel = HIGH);
+	KMP_RS485(HardwareSerial& hwSerial, int tePin, int txPin = -1, int rxPin = -1, int teLevel = HIGH);
 #else
 	/*!
 	 * @brief Crate an instance of KMP_RS485 with TX break control
@@ -56,17 +56,11 @@ public:
 	/*!
 	 * @brief Start RS485 connection
 	 * @param baud Speed. Values: 75, 110, 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200 and etc. bit/s
-	 */
-	virtual void begin(unsigned long baudrate);
-
-	/*!
-	 * @brief Start RS485 connection
-	 * @param baud Speed. Values: 75, 110, 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200 and etc. bit/s
 	 * @param config Configuration - data bits, parity, stop bits. Values: SERIAL_5N1, SERIAL_6N1, SERIAL_7N1, SERIAL_8N1, SERIAL_5N2, SERIAL_6N2,
 	 *               SERIAL_7N2, SERIAL_8N2, SERIAL_5E1, SERIAL_6E1, SERIAL_7E1, SERIAL_8E1, SERIAL_5E2, SERIAL_6E2, SERIAL_7E2, SERIAL_8E2,
 	 *               SERIAL_5O1, SERIAL_6O1, SERIAL_7O1, SERIAL_8O1, SERIAL_5O2, SERIAL_6O2, SERIAL_7O2, SERIAL_8O2
 	 */
-	virtual void begin(unsigned long baudrate, uint16_t config);
+	virtual void begin(unsigned long baudrate, uint32_t config = SERIAL_8N1);
 
 	/*!
 	 * @brief End RS485 connection
@@ -150,11 +144,11 @@ private:
 	int _teLevelLow;
 
 	unsigned long _baudrate;
-	uint16_t _config;
+	uint32_t _config;
 	bool _startTransmission;
 
 	void sendBreak(unsigned int duration, bool isMilliseconds);
-	void beginSerial(unsigned long baudrate, uint16_t config);
+	void beginSerial();
 };
 
 #endif

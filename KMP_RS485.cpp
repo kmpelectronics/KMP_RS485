@@ -46,12 +46,7 @@ KMP_RS485::KMP_RS485(HardwareSerial& hwSerial, int tePin, int txPin, int teLevel
 	_teLevelLow = teLevel == LOW ? HIGH : LOW ;
 }
 
-void KMP_RS485::begin(unsigned long baudrate)
-{
-	begin(baudrate, SERIAL_8N1);
-}
-
-void KMP_RS485::begin(unsigned long baudrate, uint16_t config)
+void KMP_RS485::begin(unsigned long baudrate, uint32_t config)
 {
 	_baudrate = baudrate;
 	_config = config;
@@ -61,7 +56,7 @@ void KMP_RS485::begin(unsigned long baudrate, uint16_t config)
 
 	_startTransmission = false;
 
-	beginSerial(baudrate, config);
+	beginSerial();
 }
 
 void KMP_RS485::end()
@@ -150,7 +145,7 @@ void KMP_RS485::sendBreak(unsigned int duration, bool isMilliseconds)
 		delayMicroseconds(duration);
 	}
 	
-	beginSerial(_baudrate, _config);
+	beginSerial();
 }
 
 void KMP_RS485::sendBreak(unsigned int duration)
@@ -163,16 +158,16 @@ void KMP_RS485::sendBreakMicroseconds(unsigned int duration)
 	sendBreak(duration, false);
 }
 
-void KMP_RS485::beginSerial(unsigned long baudrate, uint16_t config)
+void KMP_RS485::beginSerial()
 {
 #ifdef ESP8266
-	SerialConfig serialConfig = static_cast<SerialConfig>(config);
-	_serial->begin(baudrate, serialConfig);
+	SerialConfig serialConfig = static_cast<SerialConfig>(_config);
+	_serial->begin(_baudrate, serialConfig);
 #elif ESP32
-	_serial->begin(baudrate, config, _rxPin, _txPin);
+	_serial->begin(_baudrate, _config, _rxPin, _txPin);
 	// It is not used at the moment
-	_txPinFlushDelayINuS = (uint32_t)((1000000 / baudrate) * 15);
+	_txPinFlushDelayINuS = (uint32_t)((1000000 / _baudrate) * 15);
 #else
-	_serial->begin(baudrate, config);
+	_serial->begin(_baudrate, _config);
 #endif
 }
