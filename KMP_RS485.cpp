@@ -49,6 +49,10 @@ KMP_RS485::KMP_RS485(HardwareSerial& hwSerial, int tePin, int txPin, int teLevel
 void KMP_RS485::begin(unsigned long baudrate, uint32_t config)
 {
 	_baudrate = baudrate;
+#if ESP32
+	// It is not used at the moment
+	_txPinFlushDelayINuS = (uint32_t)((1000000 / _baudrate) * 15);
+#endif
 	_config = config;
 
 	pinMode(_tePin, OUTPUT);
@@ -165,8 +169,6 @@ void KMP_RS485::beginSerial()
 	_serial->begin(_baudrate, serialConfig);
 #elif ESP32
 	_serial->begin(_baudrate, _config, _rxPin, _txPin);
-	// It is not used at the moment
-	_txPinFlushDelayINuS = (uint32_t)((1000000 / _baudrate) * 15);
 #else
 	_serial->begin(_baudrate, _config);
 #endif
